@@ -48,7 +48,7 @@ function saveFrontendFiles(token) {
   const TokenArtifact = artifacts.readArtifactSync("ReviewToken");
 
   fs.writeFileSync(
-    path.join(contractsDir, "Token.json"),
+    path.join(contractsDir, "ReviewToken.json"),
     JSON.stringify(TokenArtifact, null, 2)
   );
 }
