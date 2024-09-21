@@ -1,5 +1,5 @@
 {
-  "name": "web-app",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@dynamic-labs/ethereum": "^3.0.2",
+    "@dynamic-labs/global-wallet": "^3.1.1",
     "@dynamic-labs/sdk-react-core": "^3.0.2",
     "@next/env": "^14.2.11",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -46,5 +47,3 @@
     "typescript": "^5"
   }
 }
-
-
