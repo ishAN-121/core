@@ -11,8 +11,8 @@
 import { IVerifyResponse } from "@/lib/world-coin/backend";
 import { AppErrorCodes, ResponseStatus } from "@/lib/world-coin/bridge";
 import { VerificationLevel } from "@/lib/world-coin/config";
-import { decryptResponse, encryptRequest, exportKey } from "@/lib/world-coin/crypto";
-import { generateSignal } from "@/lib/world-coin/hashing";
+import { decryptResponse, encryptRequest, exportKey, generateKey } from "@/lib/world-coin/crypto";
+import { encodeAction, generateSignal } from "@/lib/world-coin/hashing";
 import { ISuccessResult } from "@/lib/world-coin/result";
 import { buffer_decode, verification_level_to_credential_types } from "@/lib/world-coin/utils";
 import { verify } from "@/lib/world-coin/verify";
@@ -43,7 +43,7 @@ export default function useWorldId() {
   let key: any = null;
   let iv: any = null;
   const bridge_url = "https://bridge.worldcoin.org";
-
+  {key,iv} = await generateKey()
   const handleSign = async () => {
     const encodedBody = await encryptRequest(
       key,
@@ -51,7 +51,7 @@ export default function useWorldId() {
       JSON.stringify({
         app_id: "app_550b2d74aa400425dd38ee091d21ea90",
         action_description: "test1",
-        action: "test1",
+        action: encodeAction("test1"),
         signal: generateSignal("").digest,
         credential_types: verification_level_to_credential_types(
           VerificationLevel.Device
