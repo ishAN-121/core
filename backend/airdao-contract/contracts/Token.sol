@@ -18,7 +18,7 @@ contract Token is ERC721URIStorage, Ownable {
     mapping(address=>uint8) private _addressToRole;
 
     constructor() ERC721("Soul Bound Review Token", "SBRT") Ownable(msg.sender) {
-        _counter = 666587;
+        _counter = 0;
     }
 
     function _generateSecret(address user, address companyId, uint serviceId) internal pure returns (uint256) {
