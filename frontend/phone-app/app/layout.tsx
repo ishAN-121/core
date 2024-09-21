@@ -5,7 +5,7 @@ import {
   DynamicContextProvider,
 } from "@dynamic-labs/sdk-react-core";
 import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
-
+import ReactQueryProvider from '@/lib/react-query/provider'
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,7 +39,9 @@ export default function RootLayout({
             walletConnectors: [EthereumWalletConnectors],
           }}
         >
+          <ReactQueryProvider>
             {children}
+          </ReactQueryProvider>
         </DynamicContextProvider>
       </body>
     </html>
