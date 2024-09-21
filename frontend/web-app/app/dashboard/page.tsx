@@ -2,31 +2,39 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Bell, MessageSquare, Search } from "lucide-react";
 import Link from "next/link";
 
-import { getAllReviews } from "@/lib/api/contractApi";
-import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
-import { useEffect } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { testContract1, testContract2 } from "@/lib/api/contractApi";
+import { useIDKit } from "@worldcoin/idkit";
+import { useEffect, useState } from "react";
+import AutocompleteField from "../components/AutocompleteField";
 import AddService from "./components/AddService";
-//#0A3622
+import WorldIdPopup from "./components/WorldId";
+
 export default function Dashboard() {
-  const { primaryWallet } = useDynamicContext();
-  const walletAddress = primaryWallet?.address;
+  const [verify, setVerify] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  useEffect(() => {
+    async function callContract() {
+      const result1 = await testContract1();
+      const result2 = await testContract2();
+
+      console.log("result1", result1);
+      console.log("result2", result2);
+    }
+
+    callContract();
+  }, []);
+
+  const { open, setOpen } = useIDKit();
 
   useEffect(() => {
-    async function fetchAllServices() {
-      try {
-        const result = await getAllReviews(walletAddress);
-        console.log("RES", result);
-      } catch (error) {
-        console.error("Error fetching services:", error);
-      }
+    if (verify) {
+      setDialogOpen(true);
     }
-    fetchAllServices();
-  }, [walletAddress]);
+  }, [verify]);
 
   return (
     <>
@@ -39,7 +47,7 @@ export default function Dashboard() {
           <div className="flex items-center space-x-4">
             <div className="relative">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input className="pl-8" placeholder="Search anything in Nori..." />
+              <AutocompleteField />
             </div>
             <Button variant="outline" size="icon">
               <Bell className="h-4 w-4" />
@@ -47,14 +55,15 @@ export default function Dashboard() {
             <Button variant="outline" size="icon">
               <MessageSquare className="h-4 w-4" />
             </Button>
-            <Dialog>
-              <DialogTrigger>
-                <Button>
-                  Add new customer service <span className="ml-2">+</span>
-                </Button>
-              </DialogTrigger>
+
+            <Button onClick={() => setOpen(true)}>
+              Add new customer service <span className="ml-2">+</span>
+            </Button>
+            {open ? <WorldIdPopup setVerify={setVerify} /> : null}
+
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogContent>
-                <AddService />
+                <AddService setDialogOpen={setDialogOpen} />
               </DialogContent>
             </Dialog>
           </div>

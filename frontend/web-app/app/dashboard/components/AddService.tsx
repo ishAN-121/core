@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import CategoryTags from "./CategoryTags";
 import axios from "axios";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 interface AddServiceProps {
   onSubmit?: (data: ServiceData) => void;
@@ -22,7 +23,10 @@ interface ServiceData {
   categories: string[];
 }
 
-const AddService: React.FC<AddServiceProps> = ({ onSubmit }) => {
+function AddService({setDialogOpen}) {
+  const { primaryWallet } = useDynamicContext();
+  const walletAddress = primaryWallet?.address;
+
   const [serviceData, setServiceData] = useState<ServiceData>({
     name: "",
     phoneNumber: "",
@@ -77,58 +81,64 @@ const AddService: React.FC<AddServiceProps> = ({ onSubmit }) => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit?.(serviceData);
-    if (serviceData.logo) {
-      const imageResponse = await pinImageToIPFS(serviceData.logo);
-      console.log(imageResponse);
-      serviceData.logo = imageResponse.IpfsHash;
+  async function handleSubmit(e: React.FormEvent) {
+    try {
+      e.preventDefault();
+      if (serviceData.logo) {
+        const imageResponse = await pinImageToIPFS(serviceData.logo);
+        serviceData.logo = imageResponse.IpfsHash;
+      }
+
+      const res = await axios.post(`/api/company/service?walletId=${walletAddress}`, serviceData);
+      console.log(res);
+
+      setDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating service", error);
     }
-    const jsonResponse = await pinJsonToIPFS(serviceData);
-    console.log(jsonResponse);
-  };
+  }
 
   return (
-    <DialogHeader>
-      <DialogTitle>Add New Service</DialogTitle>
-      <DialogDescription>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="name">Service Name</Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              placeholder="Service Name"
-              value={serviceData.name}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="phoneNumber">Phone Number</Label>
-            <Input
-              id="phoneNumber"
-              name="phoneNumber"
-              type="tel"
-              placeholder="Phone Number"
-              value={serviceData.phoneNumber}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="logo">Service Logo</Label>
-            <Input id="logo" name="logo" type="file" accept="image/*" onChange={handleInputChange} />
-          </div>
-          <div>
-            <Label>Categories</Label>
-            <CategoryTags initialTags={serviceData.categories} onTagsChange={handleCategoriesChange} />
-          </div>
-          <Button type="submit">Submit</Button>
-        </form>
-      </DialogDescription>
-    </DialogHeader>
+    <>
+      <DialogHeader>
+        <DialogTitle>Add New Service</DialogTitle>
+        <DialogDescription></DialogDescription>
+      </DialogHeader>
+      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <div>
+          <Label htmlFor="name">Service Name</Label>
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            placeholder="Service Name"
+            value={serviceData.name}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <Label htmlFor="phoneNumber">Phone Number</Label>
+          <Input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            placeholder="Phone Number"
+            value={serviceData.phoneNumber}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <Label htmlFor="logo">Service Logo</Label>
+          <Input id="logo" name="logo" type="file" accept="image/*" onChange={handleInputChange} />
+        </div>
+        <div>
+          <Label>Categories</Label>
+          <CategoryTags initialTags={serviceData.categories} onTagsChange={handleCategoriesChange} />
+        </div>
+        <Button type="submit">Submit</Button>
+      </form>
+    </>
   );
-};
+}
 
 export default AddService;

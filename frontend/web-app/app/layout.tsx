@@ -1,3 +1,7 @@
+import ReactQueryProvider from "@/lib/react-query/provider";
+import { EthereumWalletConnectors } from "@dynamic-labs/ethereum";
+import { GlobalWalletExtension } from "@dynamic-labs/global-wallet";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -25,10 +29,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <DynamicContextProvider
+          settings={{
+            environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID,
+            walletConnectors: [EthereumWalletConnectors],
+            walletConnectorExtensions: [GlobalWalletExtension],
+          }}
+        >
+          <ReactQueryProvider>{children}</ReactQueryProvider>
+        </DynamicContextProvider>
       </body>
     </html>
   );

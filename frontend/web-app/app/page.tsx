@@ -3,24 +3,46 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "./components/Navbar";
 // import { useEffect } from "react";
-import { useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import { useDynamicContext, useIsLoggedIn } from "@dynamic-labs/sdk-react-core";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
-  useEffect(() => {
-    if (isLoggedIn) {
-      const isRegistered = false;
+  const { primaryWallet } = useDynamicContext();
 
-      if (!isRegistered) {
-        router.push("/register-company");
-      } else {
-        router.push("/dashboard");
+  async function checkRegistered() {
+    const walletId = primaryWallet?.address;
+    const res = await axios.get(`/api/company?walletId=${walletId}`);
+
+    if (res.status === 200 && res.data.data.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  useEffect(() => {
+    async function checkCompany() {
+      if (isLoggedIn) {
+        console.log("Logged in");
+        const isRegistered = await checkRegistered();
+        console.log(isRegistered);
+
+        if (!isRegistered) {
+          router.push("/register-company");
+        } else {
+          router.push("/dashboard");
+        }
       }
     }
+    checkCompany();
   }, [isLoggedIn, router]);
+
+  console.log(isLoggedIn);
+
   return (
     <div className="bg-[#e3e3d0] min-h-screen">
       <Navbar />
