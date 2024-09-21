@@ -5,35 +5,15 @@ import { set, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Star, Loader2 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import useWorldId from "@/hooks/use-world-id";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core";
 
 const formSchema = z.object({
   serviceName: z.string().min(2, {
@@ -54,6 +34,10 @@ export default function ServiceReviewPage({ params }: any) {
   const [connectionURL, setConnectionURL] = useState("");
   const { checkStatus, handleSign } = useWorldId();
   const [isHuman, setIsHuman] = useState(false);
+
+  const { primaryWallet } = useDynamicContext();
+  const userWalletAddr = primaryWallet?.address;
+
   const handleWorldId = () => {
     window.location.assign(connectionURL);
   };
@@ -97,20 +81,14 @@ export default function ServiceReviewPage({ params }: any) {
       <div className="container mx-auto p-4 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">
-              Submit Your Service Review
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold">Submit Your Service Review</CardTitle>
             <CardDescription>
-              We appreciate your feedback. Please share your experience with the
-              service you used.
+              We appreciate your feedback. Please share your experience with the service you used.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="serviceName"
@@ -118,10 +96,7 @@ export default function ServiceReviewPage({ params }: any) {
                     <FormItem>
                       <FormLabel>Service Name</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter the name of the service"
-                          {...field}
-                        />
+                        <Input placeholder="Enter the name of the service" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,18 +115,14 @@ export default function ServiceReviewPage({ params }: any) {
                             <Star
                               key={star}
                               className={`w-8 h-8 cursor-pointer ${
-                                star <= field.value
-                                  ? "text-yellow-400 fill-yellow-400"
-                                  : "text-gray-300"
+                                star <= field.value ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
                               }`}
                               onClick={() => form.setValue("rating", star)}
                             />
                           ))}
                         </div>
                       </FormControl>
-                      <FormDescription>
-                        Click on a star to rate the service
-                      </FormDescription>
+                      <FormDescription>Click on a star to rate the service</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -164,10 +135,7 @@ export default function ServiceReviewPage({ params }: any) {
                     <FormItem>
                       <FormLabel>Review Title</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Summarize your experience"
-                          {...field}
-                        />
+                        <Input placeholder="Summarize your experience" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -198,24 +166,17 @@ export default function ServiceReviewPage({ params }: any) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Would you recommend this service?</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your recommendation level" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="highly">
-                            Highly Recommend
-                          </SelectItem>
+                          <SelectItem value="highly">Highly Recommend</SelectItem>
                           <SelectItem value="recommend">Recommend</SelectItem>
                           <SelectItem value="neutral">Neutral</SelectItem>
-                          <SelectItem value="not_recommend">
-                            Do Not Recommend
-                          </SelectItem>
+                          <SelectItem value="not_recommend">Do Not Recommend</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -223,11 +184,7 @@ export default function ServiceReviewPage({ params }: any) {
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -248,5 +205,5 @@ export default function ServiceReviewPage({ params }: any) {
     <div className="h-screen w-screen flex align-middle items-center justify-center">
       <Button onClick={handleWorldId}>Verify You are Human</Button>
     </div>
-);
+  );
 }
