@@ -1,17 +1,12 @@
 import { IVerifyResponse } from "@/lib/world-coin/backend";
 import { AppErrorCodes, ResponseStatus } from "@/lib/world-coin/bridge";
 import { VerificationLevel } from "@/lib/world-coin/config";
-<<<<<<< Updated upstream
-import { decryptResponse, encryptRequest, exportKey, generateKey } from "@/lib/world-coin/crypto";
-import { encodeAction, generateSignal } from "@/lib/world-coin/hashing";
-=======
 import {
   decryptResponse,
   encryptRequest,
   exportKey,
 } from "@/lib/world-coin/crypto";
-import { generateSignal } from "@/lib/world-coin/hashing";
->>>>>>> Stashed changes
+import { encodeAction, generateSignal } from "@/lib/world-coin/hashing";
 import { ISuccessResult } from "@/lib/world-coin/result";
 import {
   buffer_decode,
@@ -54,16 +49,12 @@ export default function useWorldId() {
   const [verificationStatus, setVerificationStatus] = useState<
     "initialized" | "completed" | "polling" | "failed" | null
   >(null);
+
   const [connectURI, setConnectURI] = useState<string | null>(null);
   const [key, setKey] = useState<any>(null);
   const [iv, setIv] = useState<any>(null);
   const bridge_url = "https://bridge.worldcoin.org";
-<<<<<<< Updated upstream
-  {key,iv} = await generateKey()
-=======
   let request_id: string | null = null;
-
->>>>>>> Stashed changes
   const handleSign = async () => {
     const generatedKey = await generateKey();
     console.log("GENERATED KEY",generatedKey);
@@ -176,6 +167,9 @@ export default function useWorldId() {
           ""
         );
         console.log("SUCCESS", success);
+        if(success.status === "success"){
+            setVerificationStatus("completed");
+        }
       }
     };
   }
@@ -184,5 +178,5 @@ export default function useWorldId() {
 
   }
 
-  return { handleSign,checkStatus };
+  return { handleSign,checkStatus,verificationStatus };
 }

@@ -52,8 +52,8 @@ const formSchema = z.object({
 export default function ServiceReviewPage({ params }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [connectionURL, setConnectionURL] = useState("");
-  const { checkStatus, handleSign } = useWorldId();
-  const [isHuman, setIsHuman] = useState(false);
+  const { verificationStatus, handleSign } = useWorldId();
+  const [isHuman, setIsHuman] = useState(true);
   const handleWorldId = () => {
     window.location.assign(connectionURL);
   };
@@ -63,10 +63,13 @@ export default function ServiceReviewPage({ params }: any) {
     //     window.location.assign(res);
     // })
     // console.log("CONNECTION URI",connectionURL);
+    if(verificationStatus==="completed"){
+      setIsHuman(true);
+    }
     connURL.then((res: any) => {
       setConnectionURL(res);
     });
-  }, []);
+  }, [verificationStatus]);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -246,6 +249,7 @@ export default function ServiceReviewPage({ params }: any) {
   }
   return (
     <div className="h-screen w-screen flex align-middle items-center justify-center">
+      <pre >{verificationStatus!=null?verificationStatus:"null"}</pre>
       <Button onClick={handleWorldId}>Verify You are Human</Button>
     </div>
 );
